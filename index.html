@@ -2550,6 +2550,21 @@
         featured: true,
       },
       {
+        id: 'proj7',
+        title: '20213514 중간고사',
+        category: 'AI_SMART_WORK',
+        categoryLabel: 'AI Smart Work',
+        year: 2026,
+        date: '2026.10',
+        summary: '중간고사 발표 자료, 보고서, 영상 및 이미지 결과물을 모은 자료입니다.',
+        objective: '중간고사 과제 결과물을 한 파일로 정리했습니다.',
+        tags: ['중간고사', '발표 자료', '보고서', '영상'],
+        tools: [],
+        hasImage: false,
+        featured: false,
+        files: [{ name: '20213514_중간고사.zip', url: '20213514_중간고사.zip', meta: 'ZIP · 39.3 MB' }],
+      },
+      {
         id: 'proj2',
         title: '중간고사 연구 보고서',
         category: 'FOOD_NUTRITION',
@@ -2671,6 +2686,7 @@
 
       const tagsHtml = p.tags.slice(0, 4).map(t => `<span class="project-tag">${t}</span>`).join('');
       const featuredBadge = p.featured ? '<span class="badge badge--outline">대표</span>' : '';
+      const downloadBadge = p.files?.length ? '<span class="download-badge">📎 첨부 파일</span>' : '';
 
       return `
         <div class="project-card reveal" onclick="openModal('${p.id}')" tabindex="0" role="button" aria-label="${p.title} 보기" onkeydown="if(event.key==='Enter')openModal('${p.id}')">
@@ -2686,6 +2702,7 @@
             <h3 class="project-title">${p.title}</h3>
             <p class="project-summary">${p.summary}</p>
             <div class="project-tags">${tagsHtml}</div>
+            ${downloadBadge}
           </div>
         </div>`;
     }
@@ -2741,6 +2758,9 @@
       const tagsHtml = (p.tags || []).length
         ? `<div class="modal-section"><h4>태그</h4><div style="display:flex;flex-wrap:wrap;gap:6px">${p.tags.map(t => `<span class="interest-tag">${t}</span>`).join('')}</div></div>`
         : '';
+      const downloadsHtml = (p.files || []).length
+        ? `<div class="download-area"><h4 class="download-area-title">📎 첨부 파일</h4><div class="download-list">${p.files.map(file => `<div class="download-item"><div class="download-file-icon file-icon-zip">ZIP</div><div class="download-file-info"><div class="download-file-name">${file.name}</div><div class="download-file-meta">${file.meta}</div></div><a class="download-btn" href="${file.url}" download="${file.name}" aria-label="${file.name} 다운로드">다운로드</a></div>`).join('')}</div></div>`
+        : '';
 
       document.getElementById('modal-body').innerHTML = `
         <div class="modal-thumb" style="background:${cat.bg}">${thumbHtml}</div>
@@ -2755,6 +2775,7 @@
         ${p.objective ? `<div class="modal-section"><h4>목적</h4><p>${p.objective}</p></div>` : ''}
         ${toolsHtml}
         ${tagsHtml}
+        ${downloadsHtml}
       `;
 
       document.getElementById('modalOverlay').classList.add('open');
