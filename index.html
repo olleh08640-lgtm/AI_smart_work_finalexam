@@ -1059,6 +1059,210 @@
       padding-top: calc(var(--header-h) + 60px);
     }
 
+    /* Category Overview Cards */
+    .cat-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+    .cat-overview-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px 18px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+    .cat-overview-card:hover,
+    .cat-overview-card.active {
+      border-color: var(--secondary);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-3px);
+    }
+    .cat-overview-card.active {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .cat-overview-card.active .cat-ov-icon,
+    .cat-overview-card.active .cat-ov-name,
+    .cat-overview-card.active .cat-ov-desc,
+    .cat-overview-card.active .cat-ov-count { color: rgba(255,255,255,0.9); }
+    .cat-ov-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .cat-ov-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .cat-ov-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .cat-ov-count {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    /* Download badge on card */
+    .download-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(84,131,106,0.12);
+      color: var(--secondary);
+      margin-top: 10px;
+    }
+
+    /* Download area in modal */
+    .download-area {
+      border-top: 2px solid var(--border);
+      margin-top: 28px;
+      padding-top: 24px;
+    }
+    .download-area-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .download-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .download-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--base);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      transition: var(--transition);
+    }
+    .download-item:hover { border-color: var(--secondary); background: var(--white); }
+    .download-file-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .file-icon-pdf  { background: rgba(220,53,69,0.1);  color: #dc3545; }
+    .file-icon-pptx { background: rgba(255,102,0,0.1);  color: #ff6600; }
+    .file-icon-docx { background: rgba(24,59,86,0.1);   color: var(--primary); }
+    .file-icon-zip  { background: rgba(90,99,112,0.1);  color: var(--text-muted); }
+    .file-icon-drive{ background: rgba(84,131,106,0.1); color: var(--secondary); }
+    .file-icon-other{ background: rgba(90,99,112,0.08); color: var(--text-muted); }
+
+    .download-file-info { flex: 1; min-width: 0; }
+    .download-file-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .download-file-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .download-btn {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: var(--white);
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .download-btn:hover { background: var(--secondary); }
+    .download-btn--drive {
+      background: rgba(84,131,106,0.12);
+      color: var(--secondary);
+    }
+    .download-btn--drive:hover { background: var(--secondary); color: var(--white); }
+
+    /* Breadcrumb in modal */
+    .modal-breadcrumb {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .modal-breadcrumb span { color: var(--secondary); font-weight: 500; }
+
+    /* Back link in modal */
+    .modal-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      color: var(--secondary);
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 24px;
+      transition: color var(--transition);
+      border: none;
+      background: none;
+      padding: 0;
+    }
+    .modal-back-link:hover { color: var(--primary); }
+
+    /* Notice box */
+    .notice-box {
+      background: rgba(84,131,106,0.07);
+      border: 1px solid rgba(84,131,106,0.25);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-top: 24px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .notice-box-icon { flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+
+    @media (max-width: 900px) {
+      .cat-overview-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .cat-overview-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .cat-ov-desc { display: none; }
+      .download-item { flex-wrap: wrap; }
+      .download-btn { width: 100%; justify-content: center; }
+    }
+
     .archive-filters {
       background: var(--white);
       border-radius: var(--radius-md);
@@ -2065,22 +2269,51 @@
           <div class="section-header reveal">
             <span class="section-label">Project Archive</span>
             <h1 class="section-title" id="archive-title">프로젝트 자료실</h1>
-            <p class="section-subtitle">AI 스마트워크, 식품영양학, 학업 결과물 등 모든 프로젝트를 검색하고 탐색하세요.</p>
+            <p class="section-subtitle">AI 스마트워크, 식품영양학, 학업 결과물 등 게시물을 열람하고 첨부 파일을 다운로드하세요.</p>
           </div>
 
-          <!-- Filters -->
+          <!-- Category Overview Cards -->
+          <div class="cat-overview-grid reveal" id="catOverviewGrid">
+            <div class="cat-overview-card active" data-cat="all" onclick="setCatFromCard(this)">
+              <div class="cat-ov-icon">📂</div>
+              <div class="cat-ov-name">전체</div>
+              <div class="cat-ov-desc">모든 카테고리</div>
+              <div class="cat-ov-count" id="cnt-all">0개</div>
+            </div>
+            <div class="cat-overview-card" data-cat="AI_SMART_WORK" onclick="setCatFromCard(this)">
+              <div class="cat-ov-icon">🤖</div>
+              <div class="cat-ov-name">AI SMART WORK</div>
+              <div class="cat-ov-desc">AI 활용 과제·프롬프트·결과물</div>
+              <div class="cat-ov-count" id="cnt-ai">0개</div>
+            </div>
+            <div class="cat-overview-card" data-cat="FOOD_NUTRITION" onclick="setCatFromCard(this)">
+              <div class="cat-ov-icon">🍎</div>
+              <div class="cat-ov-name">FOOD &amp; NUTRITION</div>
+              <div class="cat-ov-desc">식품영양학 과제·실험·보고서</div>
+              <div class="cat-ov-count" id="cnt-food">0개</div>
+            </div>
+            <div class="cat-overview-card" data-cat="ACADEMIC_WORK" onclick="setCatFromCard(this)">
+              <div class="cat-ov-icon">📊</div>
+              <div class="cat-ov-name">ACADEMIC WORK</div>
+              <div class="cat-ov-desc">수업 과제·발표·학술 자료</div>
+              <div class="cat-ov-count" id="cnt-ac">0개</div>
+            </div>
+          </div>
+
+          <!-- Filters (search + sort) -->
           <div class="archive-filters reveal">
             <div class="search-wrap">
               <span class="search-icon">🔍</span>
-              <input type="search" class="search-input" id="searchInput" placeholder="제목, 설명, 태그, 연도 등으로 검색..."
-                aria-label="프로젝트 검색" oninput="filterProjects()" />
+              <input type="search" class="search-input" id="searchInput"
+                     placeholder="제목, 설명, 태그, 연도, 과목명으로 검색..."
+                     aria-label="프로젝트 검색" oninput="filterProjects()" />
             </div>
             <div class="filter-group" id="catFilters" role="group" aria-label="카테고리 필터">
-              <button class="filter-btn active" data-cat="all" onclick="setCat(this)">전체</button>
-              <button class="filter-btn" data-cat="AI_SMART_WORK" onclick="setCat(this)">AI Smart Work</button>
-              <button class="filter-btn" data-cat="FOOD_NUTRITION" onclick="setCat(this)">Food &amp; Nutrition</button>
-              <button class="filter-btn" data-cat="ACADEMIC_WORK" onclick="setCat(this)">Academic Work</button>
-              <button class="filter-btn" data-cat="ETC" onclick="setCat(this)">ETC.</button>
+              <button class="filter-btn active" data-cat="all"            onclick="setCat(this)">전체</button>
+              <button class="filter-btn" data-cat="AI_SMART_WORK"         onclick="setCat(this)">AI Smart Work</button>
+              <button class="filter-btn" data-cat="FOOD_NUTRITION"        onclick="setCat(this)">Food &amp; Nutrition</button>
+              <button class="filter-btn" data-cat="ACADEMIC_WORK"         onclick="setCat(this)">Academic Work</button>
+              <button class="filter-btn" data-cat="ETC"                   onclick="setCat(this)">ETC.</button>
             </div>
             <select class="sort-select" id="sortSelect" onchange="filterProjects()" aria-label="정렬">
               <option value="newest">최신순</option>
@@ -2089,7 +2322,7 @@
           </div>
 
           <p class="results-count" id="resultsCount" aria-live="polite">
-            전체 <strong id="resultsNum">0</strong>개의 프로젝트
+            전체 <strong id="resultsNum">0</strong>개의 게시물
           </p>
 
           <div class="projects-grid" id="archive-grid"></div>
@@ -2098,6 +2331,16 @@
             <div class="no-results-icon">🔍</div>
             <h3>검색 결과가 없습니다</h3>
             <p>다른 키워드나 필터로 다시 시도해보세요.</p>
+          </div>
+
+          <!-- 저작권·개인정보 안내 -->
+          <div class="notice-box" style="margin-top:40px">
+            <span class="notice-box-icon">📋</span>
+            <span>
+              게시물과 첨부 파일은 <strong>공개 동의가 확인된 자료</strong>만 제공됩니다.
+              교수자 제공 자료·타인 저작물·공동 작업자 파일은 허가 없이 재배포하지 않습니다.
+              개인정보·실험 원자료 등 민감 정보는 포함되지 않습니다.
+            </span>
           </div>
         </div>
       </section>
