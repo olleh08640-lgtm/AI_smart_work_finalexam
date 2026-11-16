@@ -296,7 +296,8 @@ img{display:block;max-width:100%;}
   display:flex;align-items:center;justify-content:center;
   transition:background var(--transition);
 }
-.book-action-btn:hover{background:rgba(180,40,40,0.8);}
+.book-action-btn:hover{background:var(--accent);}
+.book-action-btn.danger:hover{background:rgba(180,40,40,0.85);}
 .book-badge{
   position:absolute;bottom:8px;right:8px;
   font-size:0.62rem;font-weight:700;
@@ -909,6 +910,120 @@ img{display:block;max-width:100%;}
 .bm-add-label-input:focus{border-color:var(--accent);}
 
 /* ================================================================
+   COVER EDITOR MODAL & STYLES
+================================================================ */
+.modal-box-lg{
+  max-width: 760px;
+  width: 95%;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+.cover-editor-grid{
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 680px){
+  .cover-editor-grid{grid-template-columns: 1fr;}
+}
+.cover-preview-col{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cover-preview-wrap{
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1 / 1.414;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  background: #111;
+  position: relative;
+}
+.cover-preview-wrap canvas{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.cover-form-col{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cover-tabs{
+  display: flex;
+  gap: 6px;
+  background: rgba(0,0,0,0.1);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+}
+.cover-tab{
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+  text-align: center;
+}
+.cover-tab:hover{color: var(--text-primary);}
+.cover-tab.active{
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.form-group-sm{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.form-group-sm label{
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+.form-input-sm, .form-select-sm{
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.form-input-sm:focus, .form-select-sm:focus{
+  border-color: var(--accent);
+}
+.color-palette{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.color-swatch{
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform var(--transition), border-color var(--transition);
+  position: relative;
+}
+.color-swatch:hover{transform: scale(1.15);}
+.color-swatch.active{
+  border-color: var(--text-primary);
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* ================================================================
    SCROLLBAR
 ================================================================ */
 ::-webkit-scrollbar{width:6px;}
@@ -1201,6 +1316,119 @@ img{display:block;max-width:100%;}
   </div>
 </div>
 
+<!-- Cover Editor Modal -->
+<div class="modal-overlay" id="cover-modal">
+  <div class="modal-box modal-box-lg">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div class="modal-title" style="margin:0;">🎨 표지 &amp; 썸네일 설정</div>
+      <button class="panel-close-btn" onclick="CoverEditor.close()" style="font-size:1.1rem;">✕</button>
+    </div>
+    
+    <div class="cover-editor-grid">
+      <!-- Left: Live Preview -->
+      <div class="cover-preview-col">
+        <div class="cover-preview-wrap">
+          <canvas id="cover-editor-preview"></canvas>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:8px;">
+          실시간 썸네일 미리보기
+        </div>
+      </div>
+
+      <!-- Right: Settings Form -->
+      <div class="cover-form-col">
+        <!-- Mode Tabs -->
+        <div class="cover-tabs">
+          <button class="cover-tab active" id="tab-custom" onclick="CoverEditor.setMode('custom')">🎨 디자인 표지</button>
+          <button class="cover-tab" id="tab-original" onclick="CoverEditor.setMode('original')">📄 원본 1페이지</button>
+          <button class="cover-tab" id="tab-image" onclick="CoverEditor.setMode('image')">📁 이미지 업로드</button>
+        </div>
+
+        <!-- Custom Mode Settings -->
+        <div id="cover-settings-custom" style="display:flex;flex-direction:column;gap:12px;">
+          <!-- Title Input -->
+          <div class="form-group-sm">
+            <label>메인 제목 (Title)</label>
+            <input type="text" id="cover-input-title" class="form-input-sm" placeholder="문서 제목 입력" oninput="CoverEditor.updatePreview()" />
+          </div>
+
+          <!-- Subtitle Input -->
+          <div class="form-group-sm">
+            <label>서브타이틀 / 카테고리</label>
+            <input type="text" id="cover-input-sub" class="form-input-sm" placeholder="예: FOOD &amp; AI LAB · RESEARCH" oninput="CoverEditor.updatePreview()" />
+          </div>
+
+          <!-- Author/Year -->
+          <div class="form-group-sm">
+            <label>저자 / 연도 (Author &amp; Meta)</label>
+            <input type="text" id="cover-input-author" class="form-input-sm" placeholder="예: 김형남 · 2026" oninput="CoverEditor.updatePreview()" />
+          </div>
+
+          <!-- Theme Background Color Palette -->
+          <div class="form-group-sm">
+            <label>배경 색상 테마</label>
+            <div class="color-palette" id="cover-bg-palette"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+              <span style="font-size:0.72rem;color:var(--text-muted);">직접 선택:</span>
+              <input type="color" id="cover-custom-bg" value="#183B56" onchange="CoverEditor.setCustomBg(this.value)" style="cursor:pointer;border:none;background:none;width:28px;height:24px;" />
+            </div>
+          </div>
+
+          <!-- Title Accent Color Palette -->
+          <div class="form-group-sm">
+            <label>제목 &amp; 프레임 포인트 색상</label>
+            <div class="color-palette" id="cover-accent-palette"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+              <span style="font-size:0.72rem;color:var(--text-muted);">직접 선택:</span>
+              <input type="color" id="cover-custom-accent" value="#D4AF37" onchange="CoverEditor.setCustomAccent(this.value)" style="cursor:pointer;border:none;background:none;width:28px;height:24px;" />
+            </div>
+          </div>
+
+          <!-- Style Options: Font & Border -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" class="form-group-sm">
+            <div>
+              <label>폰트 스타일</label>
+              <select id="cover-font-style" class="form-select-sm" onchange="CoverEditor.updatePreview()">
+                <option value="serif">클래식 세리프 (Playfair)</option>
+                <option value="sans">모던 산세리프 (Inter)</option>
+              </select>
+            </div>
+            <div>
+              <label>프레임 스타일</label>
+              <select id="cover-frame-style" class="form-select-sm" onchange="CoverEditor.updatePreview()">
+                <option value="classic">클래식 골드 이중 테두리</option>
+                <option value="modern">모던 심플 라인</option>
+                <option value="minimal">미니멀 (테두리 없음)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Upload Mode Settings -->
+        <div id="cover-settings-image" style="display:none;">
+          <div class="drop-zone" style="padding:24px;margin:10px 0;" onclick="document.getElementById('cover-image-file').click()">
+            <input type="file" id="cover-image-file" accept="image/*" style="display:none;" onchange="CoverEditor.handleImageUpload(event)" />
+            <div style="font-size:2rem;margin-bottom:6px;">🖼️</div>
+            <div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">클릭하여 이미지 파일 선택</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">JPG, PNG, WebP 형식 지원</div>
+          </div>
+        </div>
+
+        <!-- Original Mode Settings -->
+        <div id="cover-settings-original" style="display:none;padding:24px 12px;text-align:center;font-size:0.85rem;color:var(--text-secondary);line-height:1.7;">
+          📄 업로드된 PDF 원본의 첫 페이지를 그대로 책 표지와 서재 썸네일로 복원합니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="modal-actions" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+      <button class="modal-btn cancel" onclick="CoverEditor.close()">취소</button>
+      <button class="modal-btn confirm" onclick="CoverEditor.save()">💾 표지 저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
@@ -1349,6 +1577,396 @@ window.SoundManager = {
       btn.textContent = this._enabled ? '🔊' : '🔇';
       btn.setAttribute('data-tip', this._enabled ? '효과음 끄기' : '효과음 켜기');
     }
+  }
+};
+
+/* ================================================================
+   COVER RENDERER & EDITOR (Custom Thumbnail & Cover Design)
+================================================================ */
+window.CoverRenderer = {
+  THEMES: [
+    { id: 'navy',     name: '딥 네이비',     bg: '#183B56', grad: ['#0D2235', '#183B56', '#122B3F'], defaultAccent: '#D4AF37' },
+    { id: 'green',    name: '보태니컬 그린', bg: '#54836A', grad: ['#1C3B2B', '#54836A', '#28543D'], defaultAccent: '#F3F1E8' },
+    { id: 'walnut',   name: '클래식 월넛',   bg: '#4A2E14', grad: ['#281708', '#4A2E14', '#341E0B'], defaultAccent: '#D4AF37' },
+    { id: 'burgundy', name: '와인 버건디',   bg: '#6B1724', grad: ['#380A10', '#6B1724', '#450F18'], defaultAccent: '#F7E7CE' },
+    { id: 'slate',    name: '로열 슬레이트', bg: '#2C3E50', grad: ['#17202A', '#2C3E50', '#1C2833'], defaultAccent: '#E0E6ED' },
+    { id: 'charcoal', name: '웜 차콜',       bg: '#232B32', grad: ['#12161A', '#232B32', '#181E23'], defaultAccent: '#D4AF37' },
+  ],
+
+  ACCENTS: [
+    { name: '클래식 골드', color: '#D4AF37' },
+    { name: '샴페인',     color: '#F7E7CE' },
+    { name: '소프트 아이보리', color: '#F3F1E8' },
+    { name: '에메랄드',   color: '#6CA286' },
+    { name: '순백색',     color: '#FFFFFF' },
+    { name: '로즈 골드',   color: '#E0A899' },
+  ],
+
+  draw(canvas, opts){
+    const w = canvas.width;
+    const h = canvas.height;
+    const ctx = canvas.getContext('2d');
+
+    const title      = (opts.title || 'Untitled Document').trim();
+    const subtitle   = (opts.subtitle || 'FOOD & AI LAB · ACADEMIC ARCHIVE').trim();
+    const author     = (opts.author || '김형남 · Hyungnam Kim').trim();
+    const bgTheme    = opts.bgTheme || 'navy';
+    const customBg   = opts.customBg || '#183B56';
+    const accent     = opts.accent || '#D4AF37';
+    const fontStyle  = opts.fontStyle || 'serif';
+    const frameStyle = opts.frameStyle || 'classic';
+
+    // 1. Background Fill & Gradient
+    const themeObj = this.THEMES.find(t=>t.id===bgTheme);
+    if(themeObj){
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, themeObj.grad[0]);
+      grad.addColorStop(0.5, themeObj.grad[1]);
+      grad.addColorStop(1, themeObj.grad[2]);
+      ctx.fillStyle = grad;
+    } else {
+      ctx.fillStyle = customBg;
+    }
+    ctx.fillRect(0, 0, w, h);
+
+    // 2. Leather/Paper Texture (Fine Noise & Vignette)
+    const vignette = ctx.createRadialGradient(w/2, h/2, w*0.3, w/2, h/2, w*0.9);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.4)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, w, h);
+
+    // 3. Book Spine Shadow (Left edge binding effect)
+    const spineW = w * 0.055;
+    const spineGrad = ctx.createLinearGradient(0, 0, spineW, 0);
+    spineGrad.addColorStop(0, 'rgba(0,0,0,0.5)');
+    spineGrad.addColorStop(0.6, 'rgba(0,0,0,0.15)');
+    spineGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = spineGrad;
+    ctx.fillRect(0, 0, spineW, h);
+
+    // Spine groove line
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(spineW, 0);
+    ctx.lineTo(spineW, h);
+    ctx.stroke();
+
+    // 4. Border / Frame
+    const inset = w * 0.08;
+    if(frameStyle === 'classic'){
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = Math.max(2, w * 0.007);
+      ctx.strokeRect(inset, inset, w - inset*2, h - inset*2);
+
+      const innerInset = inset + w * 0.016;
+      ctx.lineWidth = Math.max(1, w * 0.003);
+      ctx.globalAlpha = 0.7;
+      ctx.strokeRect(innerInset, innerInset, w - innerInset*2, h - innerInset*2);
+      ctx.globalAlpha = 1.0;
+
+      const cr = w * 0.015;
+      [
+        [innerInset, innerInset],
+        [w - innerInset, innerInset],
+        [innerInset, h - innerInset],
+        [w - innerInset, h - innerInset]
+      ].forEach(([cx, cy])=>{
+        ctx.fillStyle = accent;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - cr);
+        ctx.lineTo(cx + cr, cy);
+        ctx.lineTo(cx, cy + cr);
+        ctx.lineTo(cx - cr, cy);
+        ctx.closePath();
+        ctx.fill();
+      });
+    } else if(frameStyle === 'modern'){
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = Math.max(1.5, w * 0.005);
+      ctx.globalAlpha = 0.85;
+      ctx.strokeRect(inset, inset, w - inset*2, h - inset*2);
+      ctx.globalAlpha = 1.0;
+    }
+
+    // 5. Typography
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const fontSerif = `'Playfair Display', 'Noto Serif KR', Georgia, serif`;
+    const fontSans  = `'Inter', 'Noto Sans KR', sans-serif`;
+    const baseFont  = fontStyle === 'serif' ? fontSerif : fontSans;
+
+    // Subtitle / Header (Top)
+    if(subtitle){
+      ctx.font = `600 ${Math.round(w * 0.032)}px ${fontSans}`;
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = 0.85;
+      ctx.fillText(subtitle.toUpperCase(), w/2, h * 0.22);
+      ctx.globalAlpha = 1.0;
+
+      const divW = w * 0.18;
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(w/2 - divW/2, h * 0.25);
+      ctx.lineTo(w/2 + divW/2, h * 0.25);
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+    }
+
+    // Main Title (Center)
+    ctx.fillStyle = accent;
+    const maxTitleW = w - inset*2.8;
+    let titleFontSize = Math.round(w * 0.075);
+    ctx.font = `700 ${titleFontSize}px ${baseFont}`;
+    
+    const words = title.split(' ');
+    const lines = [];
+    let curLine = '';
+    for(let n=0; n<words.length; n++){
+      const testLine = curLine ? (curLine + ' ' + words[n]) : words[n];
+      const metrics = ctx.measureText(testLine);
+      if(metrics.width > maxTitleW && n > 0){
+        lines.push(curLine);
+        curLine = words[n];
+      } else {
+        curLine = testLine;
+      }
+    }
+    if(curLine) lines.push(curLine);
+    if(lines.length > 4) lines.length = 4;
+
+    const lineH = titleFontSize * 1.35;
+    const titleBlockY = h * 0.48 - ((lines.length - 1) * lineH) / 2;
+
+    lines.forEach((line, idx)=>{
+      ctx.font = `700 ${titleFontSize}px ${baseFont}`;
+      ctx.fillText(line, w/2, titleBlockY + idx * lineH);
+    });
+
+    // Decorative Icon
+    ctx.font = `${Math.round(w * 0.05)}px serif`;
+    ctx.fillStyle = accent;
+    ctx.globalAlpha = 0.6;
+    ctx.fillText('❖', w/2, h * 0.70);
+    ctx.globalAlpha = 1.0;
+
+    // Author / Meta (Bottom)
+    if(author){
+      ctx.font = `500 ${Math.round(w * 0.034)}px ${fontSans}`;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.globalAlpha = 0.9;
+      ctx.fillText(author, w/2, h * 0.82);
+      ctx.globalAlpha = 1.0;
+    }
+  }
+};
+
+window.CoverEditor = {
+  _currentDocId: null,
+  _currentDoc: null,
+  _mode: 'custom',
+  _uploadedImage: null,
+  _settings: {
+    title: '',
+    subtitle: 'FOOD & AI LAB · ACADEMIC ARCHIVE',
+    author: '김형남 · Hyungnam Kim',
+    bgTheme: 'navy',
+    customBg: '#183B56',
+    accent: '#D4AF37',
+    fontStyle: 'serif',
+    frameStyle: 'classic'
+  },
+
+  async open(docId){
+    this._currentDocId = docId;
+    this._currentDoc = LibraryManager.getDoc(docId);
+    if(!this._currentDoc){ Toast.show('문서를 찾을 수 없습니다.'); return; }
+
+    const doc = this._currentDoc;
+    this._mode = doc.coverMode || (doc.customCover ? 'custom' : 'original');
+    this._uploadedImage = (this._mode === 'image') ? doc.coverDataUrl : null;
+
+    const baseName = doc.name.replace(/\.[^.]+$/, '');
+    this._settings = Object.assign({
+      title: baseName,
+      subtitle: 'FOOD & AI LAB · ACADEMIC ARCHIVE',
+      author: '김형남 · Hyungnam Kim',
+      bgTheme: 'navy',
+      customBg: '#183B56',
+      accent: '#D4AF37',
+      fontStyle: 'serif',
+      frameStyle: 'classic'
+    }, doc.customCover || {});
+
+    document.getElementById('cover-input-title').value = this._settings.title;
+    document.getElementById('cover-input-sub').value = this._settings.subtitle;
+    document.getElementById('cover-input-author').value = this._settings.author;
+    document.getElementById('cover-font-style').value = this._settings.fontStyle;
+    document.getElementById('cover-frame-style').value = this._settings.frameStyle;
+    document.getElementById('cover-custom-bg').value = this._settings.customBg;
+    document.getElementById('cover-custom-accent').value = this._settings.accent;
+
+    this._renderPalettes();
+    this.setMode(this._mode);
+
+    document.getElementById('cover-modal').classList.add('open');
+    this.updatePreview();
+  },
+
+  close(){
+    document.getElementById('cover-modal').classList.remove('open');
+  },
+
+  setMode(mode){
+    this._mode = mode;
+    ['custom','original','image'].forEach(m=>{
+      const tab = document.getElementById('tab-'+m);
+      const sec = document.getElementById('cover-settings-'+m);
+      if(tab) tab.classList.toggle('active', m===mode);
+      if(sec) sec.style.display = (m===mode) ? 'flex' : 'none';
+    });
+    this.updatePreview();
+  },
+
+  _renderPalettes(){
+    const bgContainer = document.getElementById('cover-bg-palette');
+    if(bgContainer){
+      bgContainer.innerHTML = CoverRenderer.THEMES.map(t=>`
+        <div class="color-swatch ${this._settings.bgTheme===t.id?'active':''}"
+             style="background:${t.bg};" title="${t.name}"
+             onclick="CoverEditor.setBgTheme('${t.id}')"></div>
+      `).join('');
+    }
+
+    const accentContainer = document.getElementById('cover-accent-palette');
+    if(accentContainer){
+      accentContainer.innerHTML = CoverRenderer.ACCENTS.map(a=>`
+        <div class="color-swatch ${this._settings.accent===a.color?'active':''}"
+             style="background:${a.color};" title="${a.name}"
+             onclick="CoverEditor.setAccent('${a.color}')"></div>
+      `).join('');
+    }
+  },
+
+  setBgTheme(id){
+    this._settings.bgTheme = id;
+    const theme = CoverRenderer.THEMES.find(t=>t.id===id);
+    if(theme){
+      this._settings.customBg = theme.bg;
+      if(theme.defaultAccent && !this._currentDoc?.customCover?.accent){
+        this._settings.accent = theme.defaultAccent;
+        document.getElementById('cover-custom-accent').value = theme.defaultAccent;
+      }
+    }
+    this._renderPalettes();
+    this.updatePreview();
+  },
+
+  setCustomBg(hex){
+    this._settings.bgTheme = 'custom';
+    this._settings.customBg = hex;
+    this._renderPalettes();
+    this.updatePreview();
+  },
+
+  setAccent(color){
+    this._settings.accent = color;
+    document.getElementById('cover-custom-accent').value = color;
+    this._renderPalettes();
+    this.updatePreview();
+  },
+
+  setCustomAccent(hex){
+    this._settings.accent = hex;
+    this._renderPalettes();
+    this.updatePreview();
+  },
+
+  handleImageUpload(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+      this._uploadedImage = evt.target.result;
+      this.updatePreview();
+    };
+    reader.readAsDataURL(file);
+  },
+
+  async updatePreview(){
+    const canvas = document.getElementById('cover-editor-preview');
+    if(!canvas) return;
+    canvas.width = 440;
+    canvas.height = 622; // A4 ratio
+
+    if(this._mode === 'custom'){
+      this._settings.title      = document.getElementById('cover-input-title').value;
+      this._settings.subtitle   = document.getElementById('cover-input-sub').value;
+      this._settings.author     = document.getElementById('cover-input-author').value;
+      this._settings.fontStyle  = document.getElementById('cover-font-style').value;
+      this._settings.frameStyle = document.getElementById('cover-frame-style').value;
+
+      CoverRenderer.draw(canvas, this._settings);
+    } else if(this._mode === 'image' && this._uploadedImage){
+      const img = new Image();
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = this._uploadedImage;
+    } else if(this._mode === 'original' && this._currentDoc){
+      if(this._currentDoc.originalFile && this._currentDoc.name.toLowerCase().endsWith('.pdf')){
+        try{
+          const ab = await this._currentDoc.originalFile.arrayBuffer();
+          const pdf = await window._pdfjsLib.getDocument({data:ab}).promise;
+          const page = await pdf.getPage(1);
+          const vp = page.getViewport({scale: canvas.width / page.getViewport({scale:1}).width});
+          canvas.width = vp.width;
+          canvas.height = vp.height;
+          await page.render({canvasContext: canvas.getContext('2d'), viewport: vp}).promise;
+          pdf.destroy();
+        } catch(e){}
+      }
+    }
+  },
+
+  async save(){
+    if(!this._currentDoc) return;
+    const canvas = document.getElementById('cover-editor-preview');
+    const doc = this._currentDoc;
+
+    doc.coverMode = this._mode;
+    if(this._mode === 'custom'){
+      doc.customCover = Object.assign({}, this._settings);
+      doc.coverDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    } else if(this._mode === 'image' && this._uploadedImage){
+      doc.customCover = null;
+      doc.coverDataUrl = this._uploadedImage;
+    } else if(this._mode === 'original'){
+      doc.customCover = null;
+      if(doc.originalFile && doc.name.toLowerCase().endsWith('.pdf')){
+        try{
+          const ab = await doc.originalFile.arrayBuffer();
+          const pdf = await window._pdfjsLib.getDocument({data:ab}).promise;
+          const page = await pdf.getPage(1);
+          const vp = page.getViewport({scale: 0.5});
+          const c = document.createElement('canvas');
+          c.width = vp.width; c.height = vp.height;
+          await page.render({canvasContext: c.getContext('2d'), viewport: vp}).promise;
+          doc.coverDataUrl = c.toDataURL('image/jpeg', 0.8);
+          pdf.destroy();
+        } catch(e){}
+      }
+    }
+
+    await StorageService.putDoc(doc);
+    await LibraryManager.load();
+    this.close();
+    Toast.show('🎨 표지 설정이 저장되었습니다!');
   }
 };
 
@@ -1548,7 +2166,9 @@ window.LibraryManager = {
           </div>
         </div>
         <div class="book-actions">
-          <button class="book-action-btn" title="삭제"
+          <button class="book-action-btn" title="표지 &amp; 썸네일 설정"
+            onclick="event.stopPropagation();CoverEditor.open('${doc.id}')">🎨</button>
+          <button class="book-action-btn danger" title="삭제"
             onclick="event.stopPropagation();LibraryManager.deleteDocument('${doc.id}')">🗑</button>
         </div>
       </div>`;
@@ -1693,6 +2313,24 @@ window.BookViewer = {
 
     const ctx = canvas.getContext('2d');
 
+    // 1. Custom Designed Cover
+    if(this._doc.coverMode === 'custom' && this._doc.customCover){
+      CoverRenderer.draw(canvas, this._doc.customCover);
+      return;
+    }
+
+    // 2. Custom Image Cover
+    if(this._doc.coverMode === 'image' && this._doc.coverDataUrl){
+      const img = new Image();
+      await new Promise(res=>{
+        img.onload = () => { ctx.drawImage(img, 0, 0, coverW, coverH); res(); };
+        img.onerror = res;
+        img.src = this._doc.coverDataUrl;
+      });
+      return;
+    }
+
+    // 3. Original PDF First Page
     if(this._pdf){
       const page = await this._pdf.getPage(1);
       const vp   = page.getViewport({scale: coverW / page.getViewport({scale:1}).width});
