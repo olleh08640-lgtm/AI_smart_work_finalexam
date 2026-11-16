@@ -1039,6 +1039,7 @@ img{display:block;max-width:100%;}
     <button class="reader-tool-btn" id="btn-preview"  onclick="ReadingTools.togglePanel('preview')"  data-tip="미리보기">⊞</button>
     <button class="reader-tool-btn" onclick="ReadingTools.addBookmark()" data-tip="현재 페이지 북마크">➕🔖</button>
     <button class="reader-tool-btn" onclick="ReadingTools.downloadOriginal()" data-tip="원본 다운로드">⬇</button>
+    <button class="reader-tool-btn" onclick="SoundManager.toggle()" data-tip="효과음 끄기" id="btn-sound">🔊</button>
     <button class="reader-tool-btn" onclick="ReadingTools.toggleFullscreen()" data-tip="전체 화면" id="btn-fs">⛶</button>
     <button class="reader-tool-btn" onclick="ThemeManager.toggle()" data-tip="테마 전환" id="theme-btn-reader">🌙</button>
   </div>
@@ -1292,6 +1293,62 @@ window.ThemeManager = {
       const el=document.getElementById(id);
       if(el) el.textContent=icon;
     });
+  }
+};
+
+/* ================================================================
+   SOUND MANAGER (Page Flip Sound)
+================================================================ */
+window.SoundManager = {
+  _enabled: true,
+  _audioPool: [],
+  _poolSize: 3,
+  _poolIdx: 0,
+  _soundSrc: '49053354-page-turn-305789.mp3',
+
+  init(){
+    const saved = localStorage.getItem('eb_sound_enabled');
+    this._enabled = (saved === null) ? true : (saved === 'true');
+    this._initPool();
+    this.applyUI();
+  },
+
+  _initPool(){
+    this._audioPool = [];
+    for(let i=0; i<this._poolSize; i++){
+      const audio = new Audio(this._soundSrc);
+      audio.preload = 'auto';
+      audio.volume = 0.8;
+      this._audioPool.push(audio);
+    }
+  },
+
+  playFlip(){
+    if(!this._enabled || !this._audioPool.length) return;
+    try {
+      const audio = this._audioPool[this._poolIdx];
+      this._poolIdx = (this._poolIdx + 1) % this._poolSize;
+      audio.currentTime = 0;
+      const playPromise = audio.play();
+      if(playPromise !== undefined){
+        playPromise.catch(()=>{ /* Autoplay policy or error catch */ });
+      }
+    } catch(e){}
+  },
+
+  toggle(){
+    this._enabled = !this._enabled;
+    localStorage.setItem('eb_sound_enabled', this._enabled);
+    this.applyUI();
+    Toast.show(this._enabled ? '🔊 효과음이 켜졌습니다.' : '🔇 효과음이 꺼졌습니다.');
+  },
+
+  applyUI(){
+    const btn = document.getElementById('btn-sound');
+    if(btn){
+      btn.textContent = this._enabled ? '🔊' : '🔇';
+      btn.setAttribute('data-tip', this._enabled ? '효과음 끄기' : '효과음 켜기');
+    }
   }
 };
 
@@ -1667,6 +1724,7 @@ window.BookViewer = {
   },
 
   async openBook(){
+    SoundManager.playFlip();
     this._showCover(false);
     await this._renderSpread(this._currentPage);
   },
@@ -1751,6 +1809,8 @@ window.BookViewer = {
     const next = this._currentPage + 2;
     if(next >= this._totalPages) return;
 
+    SoundManager.playFlip();
+
     // Pre-render next spread onto offscreen canvases FIRST
     const {pageW, pageH} = this._getPageDimensions();
     const nextLeftCanvas  = await this._renderOffscreen(next+1,   pageW, pageH);
@@ -1770,6 +1830,8 @@ window.BookViewer = {
     if(this._isAnimating||this._coverShown) return;
     const prev = this._currentPage - 2;
     if(prev < 0) return;
+
+    SoundManager.playFlip();
 
     const {pageW, pageH} = this._getPageDimensions();
     const prevLeftCanvas  = await this._renderOffscreen(prev+1,   pageW, pageH);
@@ -1967,6 +2029,7 @@ window.BookViewer = {
   },
 
   async jumpToPage(pageIdx){
+    SoundManager.playFlip();
     if(this._coverShown) this._showCover(false);
     pageIdx = Math.max(0, Math.min(pageIdx, this._totalPages-1));
     if(pageIdx % 2 !== 0 && pageIdx > 0) pageIdx--;
@@ -2226,6 +2289,7 @@ window.ReadingTools = {
 window.AppController = {
   async init(){
     ThemeManager.init();
+    SoundManager.init();
     await LibraryManager.load();
     this._initDropZone();
     this._initFileInput();
